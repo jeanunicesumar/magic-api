@@ -1,9 +1,10 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { User } from './user';
 import { UsersRepository } from './users.repository';
 import { LoginUserDTO } from './dto/loginUserDto';
 import { Token } from 'src/config/token/token';
 import { CreateUserDto } from './dto/createUserDto';
+import { UpdateUserDto } from './dto/updateUserDto';
 
 
 @Injectable()
@@ -14,16 +15,38 @@ export class UsersService {
         private readonly token: Token
     ) { }
 
-    async create(user: CreateUserDto): Promise<void> {
+    public async findAll(): Promise<User[]> {
+        return this.repository.findAll();
+    }
+
+    public async findById(id: string): Promise<User> {
+        return this.find(id);        
+    }
+
+    public async create(user: CreateUserDto): Promise<void> {
         this.repository.create(user);       
     }
 
-    async login(user: LoginUserDTO): Promise<String> {
+    public async update(id: string, user: UpdateUserDto): Promise<void> {
+
+        await this.find(id);
+        
+        this.repository.update(id, user);
+    }
+
+    public async delete(id: string): Promise<void> {
+
+        await this.find(id);
+
+        this.repository.delete(id);
+    }
+
+    public async login(user: LoginUserDTO): Promise<String> {
 
         const foundUser: User | null = await this.repository.findByUsername(user.username);
 
         if (!foundUser) {
-            throw new UnauthorizedException();
+            throw new NotFoundException(`User ${user.username} not found.`);
         }
 
         if (foundUser.password !== user.password) {
@@ -31,10 +54,17 @@ export class UsersService {
         }
 
         return this.token.generate(foundUser);
-
     }
 
-    async findAll(): Promise<User[]> {
-        return this.repository.findAll();
+    private async find(id: string): Promise<User> {
+
+        const foundUser: User | null = await this.repository.findById(id);
+
+        if (!foundUser) {
+            throw new NotFoundException(`User ${id} not found.`);
+        }
+
+        return foundUser;
     }
+
 }

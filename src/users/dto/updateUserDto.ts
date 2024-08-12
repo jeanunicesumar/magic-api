@@ -1,7 +1,7 @@
 import { IsEmail, IsEnum, IsNotEmpty, IsString } from "class-validator";
 import { Role } from "../roles/role";
 
-export class CreateUserDto {  
+export class UpdateUserDto {  
 
     @IsEmail()
     @IsNotEmpty()
