@@ -21,7 +21,7 @@ export class User {
     password: string;
 
     @IsEnum(Role)
-    @Prop({ required: true, enum: Role, default: Role.USER })
+    @Prop({ enum: Role, default: Role.USER })
     role: Role;
 
 }
