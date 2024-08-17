@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { User } from './user';
 import { UsersRepository } from './users.repository';
-import { LoginUserDTO } from './dto/loginUserDto';
+import { LoginUserDTO } from './dto/login-user-dto';
 import { Token } from 'src/config/token/token';
-import { CreateUserDto } from './dto/createUserDto';
-import { UpdateUserDto } from './dto/updateUserDto';
+import { CreateUserDto } from './dto/create-user-dto';
+import { UpdateUserDto } from './dto/update-user-dto';
+import { User } from './entities/user.entity';
 
 
 @Injectable()

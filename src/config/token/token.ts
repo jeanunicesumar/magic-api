@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-import { User } from "src/users/user";
 import { Payload } from "./payload";
+import { User } from "src/users/entities/user.entity";
 
 @Injectable()
 export class Token {
