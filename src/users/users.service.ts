@@ -5,6 +5,7 @@ import { Token } from 'src/config/token/token';
 import { CreateUserDto } from './dto/create-user-dto';
 import { UpdateUserDto } from './dto/update-user-dto';
 import { User } from './entities/user.entity';
+import { Password } from 'src/config/password/password';
 
 
 @Injectable()
@@ -12,7 +13,8 @@ export class UsersService {
 
     constructor(
         private readonly repository: UsersRepository,
-        private readonly token: Token
+        private readonly token: Token,
+        private readonly password: Password
     ) { }
 
     public async findAll(): Promise<User[]> {
@@ -24,6 +26,9 @@ export class UsersService {
     }
 
     public async create(user: CreateUserDto): Promise<void> {
+
+        user.password = await this.password.encrypt(user.password);
+        
         this.repository.create(user);       
     }
 
@@ -45,11 +50,9 @@ export class UsersService {
 
         const foundUser: User | null = await this.repository.findByUsername(user.username);
 
-        if (!foundUser) {
-            throw new NotFoundException(`User ${user.username} not found.`);
-        }
+        this.validateFound(foundUser, user.username);
 
-        if (foundUser.password !== user.password) {
+        if (this.isInvalidPassword(user.password, foundUser.password)) {
             throw new UnauthorizedException();
         }
 
@@ -60,11 +63,19 @@ export class UsersService {
 
         const foundUser: User | null = await this.repository.findById(id);
 
-        if (!foundUser) {
-            throw new NotFoundException(`User ${id} not found.`);
-        }
+       this.validateFound(foundUser, id);
 
         return foundUser;
+    }
+
+    private isInvalidPassword(password: string, hashPassword: string): boolean {
+        return !this.password.compare(password, hashPassword);
+    }
+
+    private validateFound(user: User, fieldMessage: string): void {
+        if (!user) {
+            throw new NotFoundException(`User ${fieldMessage} not found.`);
+        }
     }
 
 }

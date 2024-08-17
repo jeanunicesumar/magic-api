@@ -7,6 +7,7 @@ import { UsersController } from './users.controller';
 import { UsersRepository } from './users.repository';
 import { Token } from 'src/config/token/token';
 import { UsersSchema } from './entities/user.entity';
+import { Password } from 'src/config/password/password';
 
 @Module({
     imports: [
@@ -20,7 +21,7 @@ import { UsersSchema } from './entities/user.entity';
             }),
         })
     ],
-    providers: [UsersService, UsersRepository, Token],
+    providers: [UsersService, UsersRepository, Token, Password],
     controllers: [UsersController],
 })
 export class UsersModule {}
