@@ -6,12 +6,12 @@ import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { UsersRepository } from './users.repository';
 import { Token } from 'src/config/token/token';
-import { UsersSchema } from './entities/user.entity';
+import { User, UsersSchema } from './entities/user.entity';
 import { Password } from 'src/config/password/password';
 
 @Module({
     imports: [
-        MongooseModule.forFeature([{ name: 'User', schema: UsersSchema }]),
+        MongooseModule.forFeature([{ name: User.name, schema: UsersSchema }]),
         JwtModule.registerAsync({
             global: true,
             inject: [ConfigService],

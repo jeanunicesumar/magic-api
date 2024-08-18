@@ -1,26 +1,42 @@
 import { Injectable } from '@nestjs/common';
 import { CreateDeckDto } from './dto/create-deck.dto';
 import { UpdateDeckDto } from './dto/update-deck.dto';
+import { Deck } from './entities/deck.entity';
+import { DecksRepository } from './decks.repository';
+import { MagicRequest } from 'src/utils/request/magic.request';
+import { Card } from './entities/card.entity';
+import { DecksFactory } from 'src/utils/factories/decks-factory';
 
 @Injectable()
 export class DecksService {
-  create(createDeckDto: CreateDeckDto) {
-    return 'This action adds a new deck';
+
+  constructor(
+    private readonly repository: DecksRepository,
+    private readonly factory: DecksFactory
+  ) {}
+
+  public async generate(): Promise<Deck> {
+    return await this.factory.build();
   }
 
-  findAll() {
-    return `This action returns all decks`;
+  public async create(createDeckDto: CreateDeckDto): Promise<void> {
+    return this.repository.create(createDeckDto);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} deck`;
+  public async findAll(): Promise<Deck[]> {
+    return this.repository.findAll();
   }
 
-  update(id: string, updateDeckDto: UpdateDeckDto) {
-    return `This action updates a #${id} deck`;
+  public async findOne(id: string): Promise<Deck> {
+    return this.repository.findById(id);
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} deck`;
+  public async update(id: string, deck: UpdateDeckDto): Promise<void> {
+    return this.repository.update(id, deck);
   }
+
+  public async remove(id: string): Promise<void> {
+    return this.repository.delete(id);
+  }
+
 }
