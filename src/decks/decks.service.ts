@@ -1,11 +1,10 @@
 import { Injectable } from '@nestjs/common';
+import { DecksFactory } from 'src/utils/factories/decks-factory';
+import { Json } from 'src/utils/json/json';
+import { DecksRepository } from './decks.repository';
 import { CreateDeckDto } from './dto/create-deck.dto';
 import { UpdateDeckDto } from './dto/update-deck.dto';
 import { Deck } from './entities/deck.entity';
-import { DecksRepository } from './decks.repository';
-import { MagicRequest } from 'src/utils/request/magic.request';
-import { Card } from './entities/card.entity';
-import { DecksFactory } from 'src/utils/factories/decks-factory';
 
 @Injectable()
 export class DecksService {
@@ -17,6 +16,11 @@ export class DecksService {
 
   public async generate(): Promise<Deck> {
     return await this.factory.build();
+  }
+
+  public async generateJson(): Promise<string> {
+    const deck: Deck = await this.factory.build();
+    return Json.toJson(deck);
   }
 
   public async create(createDeckDto: CreateDeckDto): Promise<void> {

@@ -1,4 +1,4 @@
-import { IsEmail, IsEnum, IsNotEmpty, IsString } from "class-validator";
+import { IsEmail, IsEnum, IsNotEmpty } from "class-validator";
 import { Role } from "../roles/role";
 
 export class UpdateUserDto {  

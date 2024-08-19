@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
-import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { UsersService } from './users.service';
+import { JwtModule } from '@nestjs/jwt';
+import { MongooseModule } from '@nestjs/mongoose';
+import { Password } from '../config/password/password';
+import { Token } from '../config/token/token';
+import { User, UsersSchema } from './entities/user.entity';
 import { UsersController } from './users.controller';
 import { UsersRepository } from './users.repository';
-import { Token } from 'src/config/token/token';
-import { User, UsersSchema } from './entities/user.entity';
-import { Password } from 'src/config/password/password';
+import { UsersService } from './users.service';
 
 @Module({
     imports: [

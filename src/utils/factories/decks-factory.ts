@@ -1,16 +1,23 @@
 import { Injectable } from '@nestjs/common';
-import { MagicRequest } from '../request/magic.request';
-import { Deck } from '../../decks/entities/deck.entity';
+import CardAdapter from 'src/decks/adapter/card.adapter';
+import { CreateCardDto } from 'src/decks/dto/create-card.dto';
 import { Card } from '../../decks/entities/card.entity';
+import { Deck } from '../../decks/entities/deck.entity';
+import { MagicRequest } from '../request/magic.request';
 
 @Injectable()
 export class DecksFactory {
 
-    constructor(private readonly magicRequest: MagicRequest) {}
+    constructor(
+        private readonly magicRequest: MagicRequest,
+        private readonly cardAdapter: CardAdapter
+    ) {}
 
-    public async build(): Promise<Deck> {
+    public async build(): Promise<Deck> {  
 
-        const commander: Card = await this.findCommander();
+        const commanderFound: CreateCardDto = await this.magicRequest.findCommander();
+        const commander: Card = this.cardAdapter.createToEntity(commanderFound);
+
         const colorsFormatted: string = this.formatterColors(commander.colorIdentity);
 
         const cards: Card[] = await this.findCards(colorsFormatted, 99);
@@ -20,10 +27,6 @@ export class DecksFactory {
         deck.cards = cards;
 
         return deck;
-    }
-
-    private async findCommander(): Promise<Card> {
-        return this.magicRequest.findCommander();
     }
 
     private formatterColors(colors: string[]): string {
@@ -37,12 +40,13 @@ export class DecksFactory {
 
         while (quantityCards < size) {
             
-            const cards: Card[] = await this.findCardsByColors(colorsFormatted);
+            const cards: Card[] = (await this.magicRequest.findCardsByColors(colorsFormatted))
+                .map(card => this.cardAdapter.createToEntity(card));
 
             for(const card of cards) {
 
-                if (card.supertypes?.includes('Legendary')) continue;
-                if (card.rarity !== 'Basic Land' && cardByMultiverseid.has(card.multiverseid)) continue;
+                if (card.isCommander()) continue;
+                if (card.isNotBasicLand() && cardByMultiverseid.has(card.multiverseid)) continue;
                 
                 cardByMultiverseid.set(card.multiverseid, card);
                 quantityCards++;
@@ -53,10 +57,6 @@ export class DecksFactory {
 
         return Array.from(cardByMultiverseid.values());
 
-    }
-
-    private async findCardsByColors(colors: string): Promise<Card[]> {
-        return this.magicRequest.findCardsByColors(colors);
     }
 
 }

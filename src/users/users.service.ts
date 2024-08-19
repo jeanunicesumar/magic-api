@@ -1,11 +1,11 @@
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { UsersRepository } from './users.repository';
-import { LoginUserDTO } from './dto/login-user-dto';
-import { Token } from 'src/config/token/token';
-import { CreateUserDto } from './dto/create-user-dto';
-import { UpdateUserDto } from './dto/update-user-dto';
+import { Password } from '../config/password/password';
+import { Token } from '../config/token/token';
+import { CreateUserDto } from './dto/create-user.dto';
+import { LoginUserDTO } from './dto/login-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
-import { Password } from 'src/config/password/password';
+import { UsersRepository } from './users.repository';
 
 
 @Injectable()
@@ -34,6 +34,10 @@ export class UsersService {
 
     public async update(id: string, user: UpdateUserDto): Promise<void> {
 
+        if (user.password) {
+            user.password = await this.password.encrypt(user.password);
+        }
+        
         await this.find(id);
         
         this.repository.update(id, user);

@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
+import { CreateCardDto } from "src/decks/dto/create-card.dto";
 import { ResponseCardDto } from "src/decks/dto/response-card.dto";
-import { Card } from "src/decks/entities/card.entity";
 
 @Injectable()
 export class MagicRequest {
@@ -10,9 +10,9 @@ export class MagicRequest {
 
     constructor(private readonly configService: ConfigService) {}
 
-    public async findCommander(): Promise<Card> {
+    public async findCommander(): Promise<CreateCardDto> {
 
-        const response = await fetch(`${this.url}?supertypes=Legendary&pageSize=1&random=true`);
+        const response = await fetch(`${this.url}?supertypes=Legendary&pageSize=1&random=true&colorIdentity=G|U|B|W|R`);
         const responseJson: ResponseCardDto = await response.json();
 
         if (responseJson.cards.length === 0) {
@@ -22,7 +22,7 @@ export class MagicRequest {
         return responseJson.cards[0];
     }
 
-    public async findCardsByColors(colors: string): Promise<Card[]> {
+    public async findCardsByColors(colors: string): Promise<CreateCardDto[]> {
 
         const response = await fetch(`${this.url}?colorIdentity=${colors}&pageSize=${100}&random=true`);
         const responseJson: ResponseCardDto = await response.json();

@@ -1,9 +1,9 @@
-import { Body, Controller, Post, Get, Param, Patch, Delete } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user-dto';
-import { LoginUserDTO } from './dto/login-user-dto';
-import { UpdateUserDto } from './dto/update-user-dto';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post } from '@nestjs/common';
+import { CreateUserDto } from './dto/create-user.dto';
+import { LoginUserDTO } from './dto/login-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
+import { UsersService } from './users.service';
 
 @Controller('users')
 export class UsersController {
@@ -31,13 +31,15 @@ export class UsersController {
     }
 
     @Delete(':id')
+    @HttpCode(HttpStatus.NO_CONTENT)
     public async delete(@Param('id') id: string): Promise<void> {
         return this.service.delete(id);
     }
 
-    @Post('/login')
-    public async login(@Body() user: LoginUserDTO): Promise<String> {
-        return this.service.login(user);
+    @Post('/auth')
+    @HttpCode(HttpStatus.OK)
+    public async login(@Body() user: LoginUserDTO): Promise<Object> {
+        return { token: await this.service.login(user)};
     }
     
 }

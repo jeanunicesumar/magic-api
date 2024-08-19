@@ -1,4 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { Expose } from "class-transformer";
 import { IsNotEmpty } from "class-validator";
 import { HydratedDocument } from "mongoose";
 
@@ -46,6 +47,16 @@ export class Card {
     multiverseid: number;
 
     imageUrl: string;
+
+    @Expose({ toPlainOnly: true })
+    isCommander(): boolean {
+        return this.supertypes?.includes('Legendary');
+    }
+
+    @Expose({ toPlainOnly: true })
+    isNotBasicLand(): boolean {
+        return this.rarity !== 'Basic Land';
+    }
 
 }
 
