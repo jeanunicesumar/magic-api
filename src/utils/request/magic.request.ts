@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { CreateCardDto } from "src/decks/dto/create-card.dto";
 import { ResponseCardDto } from "src/decks/dto/response-card.dto";
@@ -10,21 +10,17 @@ export class MagicRequest {
 
     constructor(private readonly configService: ConfigService) {}
 
-    public async findCommander(): Promise<CreateCardDto> {
+    public async findCommander(): Promise<ResponseCardDto> {
 
-        const response = await fetch(`${this.url}?supertypes=Legendary&pageSize=1&random=true&colorIdentity=G|U|B|W|R`);
+        const response = await fetch(`${this.url}?random=true`);
         const responseJson: ResponseCardDto = await response.json();
 
-        if (responseJson.cards.length === 0) {
-            throw new NotFoundException("Não foi possível encontrar um Commander!");
-        }
-
-        return responseJson.cards[0];
+        return responseJson;
     }
 
     public async findCardsByColors(colors: string): Promise<CreateCardDto[]> {
 
-        const response = await fetch(`${this.url}?colorIdentity=${colors}&pageSize=${100}&random=true`);
+        const response = await fetch(`${this.url}?coloridentity=${colors}&random=true`);
         const responseJson: ResponseCardDto = await response.json();
  
         return responseJson.cards;
