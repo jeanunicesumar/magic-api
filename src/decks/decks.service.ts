@@ -14,12 +14,12 @@ export class DecksService {
     private readonly factory: DecksFactory
   ) {}
 
-  public async generate(): Promise<Deck> {
-    return await this.factory.build();
+  public async generate(cache: string): Promise<Deck> {
+    return await this.factory.build(this.convertCacheToBoolean(cache));
   }
 
-  public async generateJson(): Promise<string> {
-    const deck: Deck = await this.factory.build();
+  public async generateJson(cache: string): Promise<string> {
+    const deck: Deck = await this.factory.build(this.convertCacheToBoolean(cache));
     return Json.toJson(deck);
   }
 
@@ -41,6 +41,16 @@ export class DecksService {
 
   public async remove(id: string): Promise<void> {
     return this.repository.delete(id);
+  }
+
+  private convertCacheToBoolean(cache: string): boolean {
+    
+    if ('false' === cache?.toLowerCase()) {
+      return false;
+    }
+
+    return true;
+
   }
 
 }

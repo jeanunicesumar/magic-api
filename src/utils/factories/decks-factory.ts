@@ -1,5 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { RedisService } from 'src/config/redis/redis.service';
 import CardAdapter from 'src/decks/adapter/card.adapter';
+import { CreateCardDto } from 'src/decks/dto/create-card.dto';
 import { Card } from '../../decks/entities/card.entity';
 import { Deck } from '../../decks/entities/deck.entity';
 import { MagicRequest } from '../request/magic.request';
@@ -9,75 +11,108 @@ export class DecksFactory {
 
     constructor(
         private readonly magicRequest: MagicRequest,
-        private readonly cardAdapter: CardAdapter
+        private readonly cardAdapter: CardAdapter,
+        private readonly redis: RedisService
     ) {}
 
-    public async build(): Promise<Deck> {  
+    public async build(cache: boolean): Promise<Deck> {
 
-        console.time('commander');
-        const commander: Card = await this.findCommander();
-        console.timeEnd('commander');
+        const commander = await this.findCommander(cache);
+        const colorsFormatted = this.formatColors(commander.colorIdentity);
 
-        const colorsFormatted: string = this.formatterColors(commander.colorIdentity);
-
-        console.time('cards');
-        const cards: Card[] = await this.findCards(colorsFormatted, 99);
-        console.timeEnd('cards');
+        const cards = await this.findCards(colorsFormatted, 99, cache);
         cards.push(commander);
+
+        return this.createDeck(cards);
+    }
+
+    private async findCommander(cache: boolean): Promise<Card> {
         
-        const deck: Deck = new Deck();
-        deck.cards = cards;
+        for (let count = 0, page = 1; count < 5; count++, page++) {
 
-        return deck;
+            const requestUrl = this.buildRequestUrl(page, true);
+            const cards: CreateCardDto[] = await this.getOrFetchCards(requestUrl, page, cache);
+            const commander: CreateCardDto = cards.find(this.filterCommander());
+
+            if (commander) {
+                return this.cardAdapter.createToEntity(commander);
+            }
+        }
+
+        throw new NotFoundException("Não foi encontrado commander para a montagem do Deck.");
     }
 
-    private formatterColors(colors: string[]): string {
-        return colors.join("|");
+    private formatColors(colors: string[]): string {
+        return colors.join(" ");
     }
 
-    private async findCards(colorsFormatted: string, size: number): Promise<Card[]> {
+    private async findCards(colorsFormatted: string, size: number, cache: boolean): Promise<Card[]> {
 
-        const cardByMultiverseid: Map<string, Card> = new Map<string, Card>();
+        const cardsFound = new Set<string>();
+        const cards: Card[] = [];
         let quantityCards: number = 0;
+        let page: number = 1;
 
         while (quantityCards < size) {
-            
-            const cards: Card[] = (await this.magicRequest.findCardsByColors(colorsFormatted))
-                .map(card => this.cardAdapter.createToEntity(card));
 
-            for(const card of cards) {
+            const requestUrl = this.buildRequestUrl(page);
+            const cardsRaw = await this.getOrFetchCards(requestUrl, page, cache);
 
-                if (card.isCommander()) continue;
-                if (card.isNotBasicLand() && cardByMultiverseid.has(card.name)) continue;
-                
-                cardByMultiverseid.set(card.name, card);
-                quantityCards++;
+            for (const card of cardsRaw) {
 
-                if (quantityCards === size) break;
-            }
-        }
+                if (quantityCards >= size) break;
 
-        return Array.from(cardByMultiverseid.values());
-
-    }
-
-    private async findCommander(): Promise<Card> {
-        
-        while(true) {
-
-            const cards: Card[] = (await this.magicRequest.findCommander())
-                .cards
-                .map(card => this.cardAdapter.createToEntity(card));
-
-            for(const card of cards) {
-
-                if (card.isCommander() && card.colorIdentity?.length > 0) {
-                    return card;
+                if (this.isValidCard(card, colorsFormatted, cardsFound)) {
+                    cardsFound.add(card.name);
+                    cards.push(this.cardAdapter.createToEntity(card));
+                    quantityCards++;
                 }
-                
             }
+
+            page++;
         }
 
+        return cards;
     }
 
+    private buildRequestUrl(page: number, isRandom: boolean = false): string {
+        return `${this.magicRequest.getUrl()}?page=${page}${isRandom ? '&random=true' : ''}`;
+    }
+
+    private async getOrFetchCards(requestUrl: string, page: number, cache: boolean): Promise<CreateCardDto[]> {
+
+        if (cache) {
+            const cachedCards = await this.redis.getValue(requestUrl);
+
+            if (cachedCards) {
+                return JSON.parse(cachedCards) as CreateCardDto[];
+            }
+        }
+        
+        const cardsRaw = await this.magicRequest.findCardsByColors(page);
+        await this.redis.setValue(requestUrl, JSON.stringify(cardsRaw));
+        return cardsRaw;
+        
+    }
+
+    private isValidCard(card: CreateCardDto, colorsFormatted: string, cardsFound: Set<string>): boolean {
+
+        const isLegendary = card.supertypes?.includes('Legendary');
+        const hasInvalidColor = !card.colorIdentity?.some(color => colorsFormatted.includes(color));
+        const isDuplicate = card.rarity !== 'Basic Land' && cardsFound.has(card.name);
+
+        return !isLegendary && !hasInvalidColor && !isDuplicate;
+    }
+
+    private filterCommander() {
+        return (commander: CreateCardDto) => 
+            commander.supertypes?.includes('Legendary') 
+            && commander.colorIdentity?.length > 0;
+    }
+
+    private createDeck(cards: Card[]): Deck {
+        const deck = new Deck();
+        deck.cards = cards;
+        return deck;
+    }
 }
