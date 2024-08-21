@@ -10,19 +10,11 @@ export class MagicRequest {
 
     constructor(private readonly configService: ConfigService) {}
 
-    public async findCommander(page: number): Promise<CreateCardDto[]> {
+    public async findCards(page: number, isRandom: boolean = false): Promise<CreateCardDto[]> {
 
-        const response = await fetch(`${this.url}?page=${page}&random=true`);
+        const response = await fetch(`${this.url}?page=${page}${isRandom ? '&random=true' : ''}`);
         const responseJson: ResponseCardDto = await response.json();
 
-        return responseJson.cards;
-    }
-
-    public async findCardsByColors(page: number): Promise<CreateCardDto[]> {
-
-        const response = await fetch(`${this.url}?page=${page}`);
-        const responseJson: ResponseCardDto = await response.json();
- 
         return responseJson.cards;
     }
 

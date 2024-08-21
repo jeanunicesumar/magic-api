@@ -31,7 +31,7 @@ export class DecksFactory {
         for (let count = 0, page = 1; count < 5; count++, page++) {
 
             const requestUrl = this.buildRequestUrl(page, true);
-            const cards: CreateCardDto[] = await this.getOrFetchCards(requestUrl, page, cache);
+            const cards: CreateCardDto[] = await this.getOrFetchCards(requestUrl, page, cache, true);
             const commander: CreateCardDto = cards.find(this.filterCommander());
 
             if (commander) {
@@ -56,7 +56,7 @@ export class DecksFactory {
         while (quantityCards < size) {
 
             const requestUrl = this.buildRequestUrl(page);
-            const cardsRaw = await this.getOrFetchCards(requestUrl, page, cache);
+            const cardsRaw = await this.getOrFetchCards(requestUrl, page, cache, false);
 
             for (const card of cardsRaw) {
 
@@ -79,7 +79,7 @@ export class DecksFactory {
         return `${this.magicRequest.getUrl()}?page=${page}${isRandom ? '&random=true' : ''}`;
     }
 
-    private async getOrFetchCards(requestUrl: string, page: number, cache: boolean): Promise<CreateCardDto[]> {
+    private async getOrFetchCards(requestUrl: string, page: number, cache: boolean, isRandom: boolean): Promise<CreateCardDto[]> {
 
         if (cache) {
             const cachedCards = await this.redis.getValue(requestUrl);
@@ -89,7 +89,7 @@ export class DecksFactory {
             }
         }
         
-        const cardsRaw = await this.magicRequest.findCardsByColors(page);
+        const cardsRaw = await this.magicRequest.findCards(page, isRandom);
         await this.redis.setValue(requestUrl, JSON.stringify(cardsRaw));
         return cardsRaw;
         
