@@ -21,9 +21,8 @@ export class DecksFactory {
         const colorsFormatted = this.formatColors(commander.colorIdentity);
 
         const cards = await this.findCards(colorsFormatted, 99, cache);
-        cards.push(commander);
 
-        return this.createDeck(cards);
+        return this.createDeck(cards, commander);
     }
 
     private async findCommander(cache: boolean): Promise<Card> {
@@ -56,7 +55,7 @@ export class DecksFactory {
         while (quantityCards < size) {
 
             const requestUrl = this.buildRequestUrl(page);
-            const cardsRaw = await this.getOrFetchCards(requestUrl, page, cache, false);
+            const cardsRaw = await this.getOrFetchCards(requestUrl, page, cache, true);
 
             for (const card of cardsRaw) {
 
@@ -97,11 +96,10 @@ export class DecksFactory {
 
     private isValidCard(card: CreateCardDto, colorsFormatted: string, cardsFound: Set<string>): boolean {
 
-        const isLegendary = card.supertypes?.includes('Legendary');
         const hasInvalidColor = !card.colorIdentity?.some(color => colorsFormatted.includes(color));
         const isDuplicate = card.rarity !== 'Basic Land' && cardsFound.has(card.name);
 
-        return !isLegendary && !hasInvalidColor && !isDuplicate;
+        return !hasInvalidColor && !isDuplicate;
     }
 
     private filterCommander() {
@@ -110,9 +108,10 @@ export class DecksFactory {
             && commander.colorIdentity?.length > 0;
     }
 
-    private createDeck(cards: Card[]): Deck {
+    private createDeck(cards: Card[], commander: Card): Deck {
         const deck = new Deck();
         deck.cards = cards;
+        deck.commander = commander;
         return deck;
     }
 }

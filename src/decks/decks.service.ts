@@ -15,11 +15,16 @@ export class DecksService {
   ) {}
 
   public async generate(cache: string): Promise<Deck> {
-    return await this.factory.build(this.convertCacheToBoolean(cache));
+    const deck: Deck = await this.factory.build(this.convertCacheToBoolean(cache));
+    this.repository.create(deck);
+
+    return deck;
   }
 
   public async generateJson(cache: string): Promise<string> {
     const deck: Deck = await this.factory.build(this.convertCacheToBoolean(cache));
+    this.repository.create(deck);
+    
     return Json.toJson(deck);
   }
 

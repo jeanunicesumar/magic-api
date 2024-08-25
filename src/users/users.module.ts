@@ -8,6 +8,7 @@ import { User, UsersSchema } from './entities/user.entity';
 import { UsersController } from './users.controller';
 import { UsersRepository } from './users.repository';
 import { UsersService } from './users.service';
+import { AuthService } from 'src/config/auth/auth.service';
 
 @Module({
     imports: [
@@ -21,7 +22,7 @@ import { UsersService } from './users.service';
             }),
         })
     ],
-    providers: [UsersService, UsersRepository, Token, Password],
+    providers: [UsersService, UsersRepository, Token, Password, AuthService],
     controllers: [UsersController],
 })
 export class UsersModule {}
