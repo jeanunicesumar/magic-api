@@ -18,8 +18,9 @@ export class Token {
     private buildPayload(user: User): Payload {
 
         return {
+            sub: user._id,
             username: user.username,
-            role: user.role
+            roles: user.roles
         }
     }
 

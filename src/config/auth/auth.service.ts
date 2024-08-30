@@ -7,12 +7,6 @@ export class AuthService {
     
     validateToken(token: string) {
 
-       console.log(this.jwtServ.verify(token, {
-            secret : '13813dhakj1238712'
-        }))
-
-        console.log(this.jwtServ.decode(token))
-
         return this.jwtServ.verify(token, {
             secret : 'teste'
         });

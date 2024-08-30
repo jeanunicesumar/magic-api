@@ -1,12 +1,14 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { IsEmail, IsEnum, IsNotEmpty } from "class-validator";
-import { HydratedDocument } from "mongoose";
+import { HydratedDocument, SchemaTypes, Types } from "mongoose";
 import { Role } from "../roles/role";
 
 export type UserDocument = HydratedDocument<User>;
 
 @Schema({ timestamps: true })
 export class User {
+
+    _id?: Types.ObjectId;
 
     @IsEmail()
     @Prop({ required: true, unique: true })
@@ -20,9 +22,9 @@ export class User {
     @Prop({ required: true, unique: true })
     password: string;
 
-    @IsEnum(Role)
-    @Prop({ enum: Role, default: Role.USER })
-    role: Role;
+    @IsEnum(Role, { each: true })
+    @Prop({ type: [String], enum: Role, default: [Role.USER] })
+    roles: Role[];
 
 }
 
