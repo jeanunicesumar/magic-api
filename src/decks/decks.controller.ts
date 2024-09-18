@@ -31,6 +31,11 @@ export class DecksController {
     return response.sendFile(filePath);
   }
 
+  @Post('/populate')
+  public async populate(): Promise<void> {
+    return this.decksService.populate();
+  }
+
   @Post()
   public async create(@Body() createDeckDto: CreateDeckDto): Promise<void> {
     return this.decksService.create(createDeckDto);

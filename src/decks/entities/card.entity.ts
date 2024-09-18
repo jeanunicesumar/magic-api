@@ -1,5 +1,4 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Expose } from "class-transformer";
 import { IsNotEmpty } from "class-validator";
 import { HydratedDocument } from "mongoose";
 
@@ -8,9 +7,7 @@ export type CardDocument = HydratedDocument<Card>;
 @Schema({ timestamps: true })
 export class Card {
 
-    @IsNotEmpty()
-    @Prop({ required: true })
-    name: string;
+    name: string = "default";
 
     @IsNotEmpty()
     @Prop({ required: true })
@@ -28,9 +25,7 @@ export class Card {
     @Prop({ required: true })
     colorIdentity: string[];
 
-    @IsNotEmpty()
-    @Prop({ required: true })
-    type: string;
+    type: string = "Default";
 
     supertypes: string[];
 
@@ -48,15 +43,7 @@ export class Card {
 
     imageUrl: string;
 
-    @Expose({ toPlainOnly: true })
-    isCommander(): boolean {
-        return this.supertypes?.includes('Legendary');
-    }
-
-    @Expose({ toPlainOnly: true })
-    isNotBasicLand(): boolean {
-        return this.rarity !== 'Basic Land';
-    }
+    isCommander: boolean = false;
 
 }
 

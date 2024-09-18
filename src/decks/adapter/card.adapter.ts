@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import Adapter from "src/utils/adapter/adapter";
-import { Card } from "../entities/card.entity";
 import { CreateCardDto } from "../dto/create-card.dto";
+import { Card } from "../entities/card.entity";
 
 @Injectable()
 export default class CardAdapter implements Adapter<Card, CreateCardDto> {
@@ -25,6 +25,7 @@ export default class CardAdapter implements Adapter<Card, CreateCardDto> {
     card.text = dto.text;
     card.multiverseid = dto.multiverseid;
     card.imageUrl = dto.imageUrl;
+    card.isCommander = dto.supertypes?.includes('Legendary');
 
     return card;
 

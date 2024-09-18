@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Deck } from './entities/deck.entity';
 import { CreateDeckDto } from './dto/create-deck.dto';
 import { UpdateDeckDto } from './dto/update-deck.dto';
+import { Deck } from './entities/deck.entity';
 
 
 @Injectable()
@@ -29,6 +29,10 @@ export class DecksRepository {
 
     public async delete(id: string): Promise<void> {
         await this.model.findByIdAndDelete(id);
+    }
+
+    public async createAll(decks: Array<Deck>) {
+        this.model.create(decks);
     }
 
 }

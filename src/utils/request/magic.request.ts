@@ -18,6 +18,10 @@ export class MagicRequest {
         return responseJson.cards;
     }
 
+    public getUrlSimple(page: number): string {
+        return `${this.url}?page=${page}`;
+    }
+
     public getUrl(): string {
         return this.configService.get<string>('API_URL');
     }
