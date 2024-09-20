@@ -15,7 +15,6 @@ export class Deck {
     @IsNotEmpty()
     @Prop({ required: true })
     commander: Card;
-
 }
 
 export const DecksSchema = SchemaFactory.createForClass(Deck);

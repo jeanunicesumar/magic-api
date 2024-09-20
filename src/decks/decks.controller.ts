@@ -37,8 +37,8 @@ export class DecksController {
   }
 
   @Post()
-  public async create(@Body() createDeckDto: CreateDeckDto): Promise<void> {
-    return this.decksService.create(createDeckDto);
+  public async create(@Body() createDeckDto: CreateDeckDto, userId: string): Promise<void> {
+    return this.decksService.create(createDeckDto, userId);
   }
 
   @Get()

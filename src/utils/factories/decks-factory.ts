@@ -26,6 +26,8 @@ export class DecksFactory {
     }
 
     private async findCommander(cache: boolean): Promise<Card> {
+
+        // TODO: Buscar no repository de card um commander - Simplificar
         
         for (let count = 0, page = 1; count < 5; count++, page++) {
 
@@ -46,6 +48,8 @@ export class DecksFactory {
     }
 
     private async findCards(colorsFormatted: string, size: number, cache: boolean): Promise<Card[]> {
+
+        // TODO: buscar no repository de cards de acordo com cores do commander
 
         const cardsFound = new Set<string>();
         const cards: Card[] = [];
@@ -75,10 +79,13 @@ export class DecksFactory {
     }
 
     private buildRequestUrl(page: number, isRandom: boolean = false): string {
+        // TODO: Retirar
         return `${this.magicRequest.getUrl()}?page=${page}${isRandom ? '&random=true' : ''}`;
     }
 
     private async getOrFetchCards(requestUrl: string, page: number, cache: boolean, isRandom: boolean): Promise<CreateCardDto[]> {
+
+        // TODO: Retirar
 
         if (cache) {
             const cachedCards = await this.redis.getValue(requestUrl);
@@ -96,6 +103,8 @@ export class DecksFactory {
 
     private isValidCard(card: CreateCardDto, colorsFormatted: string, cardsFound: Set<string>): boolean {
 
+        // TODO: Retirar
+
         const hasInvalidColor = !card.colorIdentity?.some(color => colorsFormatted.includes(color));
         const isDuplicate = card.rarity !== 'Basic Land' && cardsFound.has(card.name);
 
@@ -103,12 +112,18 @@ export class DecksFactory {
     }
 
     private filterCommander() {
+
+        // TODO: Retirar
+
         return (commander: CreateCardDto) => 
             commander.supertypes?.includes('Legendary') 
             && commander.colorIdentity?.length > 0;
     }
 
     private createDeck(cards: Card[], commander: Card): Deck {
+
+        // TODO: Retirar
+
         const deck = new Deck();
         deck.cards = cards;
         deck.commander = commander;
