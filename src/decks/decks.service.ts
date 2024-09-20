@@ -9,6 +9,9 @@ import { CreateDeckDto } from './dto/create-deck.dto';
 import { ResponseCardDto } from './dto/response-card.dto';
 import { UpdateDeckDto } from './dto/update-deck.dto';
 import { Deck } from './entities/deck.entity';
+import { User } from 'src/users/entities/user.entity';
+import { UsersRepository } from 'src/users/users.repository';
+import { users } from 'test/users/users-default';
 
 @Injectable()
 export class DecksService {
@@ -19,6 +22,7 @@ export class DecksService {
     private readonly magicRequest: MagicRequest,
     private readonly cardAdapter: CardAdapter,
     private readonly cardRepository: CardRepository,
+    private readonly user: UsersRepository
   ) {}
 
   public async generate(cache: string): Promise<Deck> {
@@ -35,8 +39,14 @@ export class DecksService {
     return Json.toJson(deck);
   }
 
-  public async create(createDeckDto: CreateDeckDto): Promise<void> {
-    return this.repository.create(createDeckDto);
+  public async create(createDeckDto: CreateDeckDto, userId: string): Promise<void> {
+    const deck = await this.repository.create(createDeckDto); 
+    const user = await this.user.findById(userId);
+
+    if (user) {
+      user.decks.push(deck);
+      this.user.create(user);  
+    }
   }
 
   public async findAll(): Promise<Deck[]> {

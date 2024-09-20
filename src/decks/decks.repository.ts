@@ -11,6 +11,10 @@ export class DecksRepository {
 
     constructor(@InjectModel(Deck.name) private readonly model: Model<Deck>) { }
 
+    // TODO: Nos cards repository(Criado com tarefa de popular)
+    // Criar método para buscar commander
+    // Criar método para buscar cartas já trazer 99 corretas filtrando terreno e cores
+
     public async findAll(): Promise<Deck[]> {
         return this.model.find();
     }
@@ -19,8 +23,8 @@ export class DecksRepository {
         return this.model.findById(id);
     }
 
-    public async create(deck: CreateDeckDto): Promise<void> {
-        this.model.create(deck);
+    public async create(deck: CreateDeckDto): Promise<Deck> {
+        return this.model.create(deck);
     }
 
     public async update(id: string, deck: UpdateDeckDto): Promise<void> {
