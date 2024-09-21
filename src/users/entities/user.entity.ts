@@ -1,8 +1,8 @@
-import { Deck } from './../../decks/entities/deck.entity';
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { IsEmail, IsEnum, IsNotEmpty } from "class-validator";
-import { HydratedDocument, SchemaTypes, Types } from "mongoose";
+import { HydratedDocument, Types } from "mongoose";
 import { Role } from "../roles/role";
+import { Deck } from './../../decks/entities/deck.entity';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -27,7 +27,7 @@ export class User {
     @Prop({ type: [String], enum: Role, default: [Role.USER] })
     roles: Role[];
 
-    @Prop({ type: [Types.ObjectId], ref: Deck })
+    @Prop({ type: [Types.ObjectId], ref: () => Deck })
     decks: Deck[];
 }
 
