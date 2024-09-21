@@ -27,8 +27,8 @@ export class User {
     @Prop({ type: [String], enum: Role, default: [Role.USER] })
     roles: Role[];
 
-    @Prop({ type: [Types.ObjectId], ref: Deck })
-    decks: Deck[];
+    @Prop({ ref: () => Deck })
+    decks: Deck[] = [];
 }
 
 export const UsersSchema = SchemaFactory.createForClass(User);

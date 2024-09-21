@@ -13,7 +13,7 @@ export class Deck {
     cards: Card[];
 
     @IsNotEmpty()
-    @Prop({ required: true })
+    @Prop({ ref: () => Card })
     commander: Card;
 }
 

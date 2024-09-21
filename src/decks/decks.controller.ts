@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, Res, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -6,15 +6,22 @@ import { DecksService } from './decks.service';
 import { CreateDeckDto } from './dto/create-deck.dto';
 import { UpdateDeckDto } from './dto/update-deck.dto';
 import { Deck } from './entities/deck.entity';
+import { AuthGuard } from 'src/config/auth/auth.guard';
+import { Role } from '../users/roles/role';
+import { Roles } from '../users/roles/roles.decorator';
+import { RolesGuard } from '../users/roles/roles.guard';
 
 @Controller('decks')
+
 export class DecksController {
 
-  constructor(private readonly decksService: DecksService) {}
-
+  constructor(private readonly decksService: DecksService) { }
+  
+  @UseGuards(AuthGuard)
   @Get('/generate')
-  public async generate(@Query('cache') cache: string = 'true'): Promise<Deck> {
-    return await this.decksService.generate(cache);
+  public async generate(@Query('cache') cache: string = 'false', @Req() request: any): Promise<Deck> {
+    const userId = request.decodedData?.sub;
+    return await this.decksService.generate(cache, userId);
   }
 
   @Get('/generate/json')
@@ -37,13 +44,16 @@ export class DecksController {
   }
 
   @Post()
-  public async create(@Body() createDeckDto: CreateDeckDto, userId: string): Promise<void> {
+  public async create(@Body() createDeckDto: CreateDeckDto, @Req() request: any): Promise<void> {
+    const userId = request.user.sub;
     return this.decksService.create(createDeckDto, userId);
   }
-
-  @Get()
-  public async findAll() {
-    return this.decksService.findAll();
+ 
+  @Get('/')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  public async findAll(@Query('page') page: number = 1) {
+       return this.decksService.findAll(page);
   }
 
   @Get(':id')
