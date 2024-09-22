@@ -8,12 +8,19 @@ export class ValidationCardsUniqueDeck implements ValidationDeckHandler {
 
     handle(deck: ValidateDeckDTO): void {
 
-        const names: Set<string> = new Set();
+        let rarityByName: Map<string, string> = new Map();
         const invalidNames: string[] = [];
 
         deck.cards.forEach(card => {
-            if (!names.has(card.name)) return;
-            if (!card.rarity?.includes("Basic Land")) invalidNames.push(card.name);
+
+            const rarity: string = rarityByName.get(card.name);
+
+            if (!rarityByName.has(card.name)) {
+                rarityByName.set(card.name, card.rarity);
+                return;  
+            } 
+
+            if (rarity === 'Basic Land' && !card.rarity?.includes("Basic Land")) invalidNames.push(card.name);
         });
 
         if (invalidNames.length !== 0) {
