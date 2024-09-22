@@ -8,7 +8,7 @@ export class ValidationCommanderDeck implements ValidationDeckHandler {
 
     handle(deck: ValidateDeckDTO): void {
         
-        if (!deck.commander.supertypes?.includes('Legendary')) {
+        if (!deck.commander.type?.startsWith('Legendary Creator')) {
             throw new NotAcceptableException("Deck inválido, um commander precisa ter um supertype de Legendary.");
         }
 
