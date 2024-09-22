@@ -13,6 +13,7 @@ export default class CardAdapter implements Adapter<Card, CreateCardDto> {
     card.manaCost = dto.manaCost;
     card.cmc = dto.cmc;
     card.colors = dto.colors?.join("-");
+    card.colorIdentity = dto.colorIdentity?.join("-");
     card.type = dto.type;
     card.types = dto.types?.join("-");
     card.supertypes = dto.supertypes?.join("-");
