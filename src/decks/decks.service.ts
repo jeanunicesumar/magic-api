@@ -1,15 +1,12 @@
 import { Injectable } from '@nestjs/common';
+import { UsersRepository } from 'src/users/users.repository';
+import { CardFactory } from 'src/utils/factories/card-factory';
 import { DecksFactory } from 'src/utils/factories/decks-factory';
 import { Json } from 'src/utils/json/json';
-import { MagicRequest } from 'src/utils/request/magic.request';
-import CardAdapter from './adapter/card.adapter';
-import { CardRepository } from './card.repository';
 import { DecksRepository } from './decks.repository';
 import { CreateDeckDto } from './dto/create-deck.dto';
-import { ResponseCardDto } from './dto/response-card.dto';
 import { UpdateDeckDto } from './dto/update-deck.dto';
 import { Deck } from './entities/deck.entity';
-import { UsersRepository } from 'src/users/users.repository';
 
 @Injectable()
 export class DecksService {
@@ -17,9 +14,7 @@ export class DecksService {
   constructor(
     private readonly repository: DecksRepository,
     private readonly factory: DecksFactory,
-    private readonly magicRequest: MagicRequest,
-    private readonly cardAdapter: CardAdapter,
-    private readonly cardRepository: CardRepository,
+    private readonly cardFactory: CardFactory,
     private readonly user: UsersRepository
   ) {}
 
@@ -37,7 +32,7 @@ export class DecksService {
   }
 
   public async create(createDeckDto: CreateDeckDto, userId: string): Promise<void> {
-    const deck = await this.repository.create(createDeckDto); 
+    const deck: Deck = await this.repository.create(createDeckDto); 
     const user = await this.user.findById(userId);
     if (user) {
       user.decks.push(deck);
@@ -64,43 +59,8 @@ export class DecksService {
   }
 
   public async populate(): Promise<void> {
-    let count = 1;
-    let urls: string[] = [];
-    let batchSize = 10;
-    let results = [];
-    let hasMoreData = true;
-
-    while (hasMoreData) {
-
-        const url: string = this.magicRequest.getUrlSimple(count);
-        urls.push(url);
-
-        if (urls.length === batchSize) {
-            const promises = urls.map(async (url) => {
-                return (await this.fetchData(url)).cards.map(card => { 
-                  const newCard = this.cardAdapter.createToEntity(card);
-                  console.log(newCard);
-                  return newCard;
-              });
-            });
-
-            const batchResults = await Promise.all(promises);
-
-            hasMoreData = false;
-
-            results.push(...batchResults);
-            urls = [];
-        }
-
-        count++;
-    }
-
-    this.cardRepository.createAll(results);
-}
-
-private async fetchData(url: string): Promise<ResponseCardDto> {
-    return await fetch(url).then((response) => response.json());
-}
+    this.cardFactory.populate();
+  }
 
   private convertCacheToBoolean(cache: string): boolean {
     

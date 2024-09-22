@@ -38,9 +38,9 @@ export class DecksController {
     return response.sendFile(filePath);
   }
 
-  @Post('/populate')
+  @Post('/populate/cards')
   public async populate(): Promise<void> {
-    return this.decksService.populate();
+    this.decksService.populate();
   }
 
   @Post()

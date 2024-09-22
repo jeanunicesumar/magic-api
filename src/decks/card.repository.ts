@@ -18,7 +18,11 @@ export class CardRepository {
     }
 
     public async createAll(cards: Array<Card>) {
-        this.model.create(cards);
+        await this.model.insertMany(cards);
+    }
+
+    public async create(cards: Card) {
+        await this.model.create(cards);
     }
 
 }

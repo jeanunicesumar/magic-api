@@ -5,18 +5,12 @@ export class CreateCardDto {
     @IsNotEmpty()
     name: string;
 
-    @IsNotEmpty()
-    names: string[];
-
     manaCost: string;
 
     cmc: string;
 
     @IsNotEmpty()
     colors: string[];
-
-    @IsNotEmpty()
-    colorIdentity: string[];
 
     @IsNotEmpty()
     type: string;
