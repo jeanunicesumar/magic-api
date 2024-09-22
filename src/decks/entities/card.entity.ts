@@ -1,5 +1,4 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { IsNotEmpty } from "class-validator";
 import { HydratedDocument } from "mongoose";
 
 export type CardDocument = HydratedDocument<Card>;
@@ -7,44 +6,50 @@ export type CardDocument = HydratedDocument<Card>;
 @Schema({ timestamps: true })
 export class Card {
 
-    name: string = "default";
+    @Prop({ required: true, default: "Jean" })
+    name: string;
 
-    @IsNotEmpty()
-    @Prop({ required: true })
-    names: string[];
-
+    @Prop()
     manaCost: string;
 
+    @Prop()
     cmc: string;
 
-    @IsNotEmpty()
-    @Prop({ required: true })
-    colors: string[];
+    @Prop()
+    colors: string;
 
-    @IsNotEmpty()
-    @Prop({ required: true })
-    colorIdentity: string[];
+    @Prop()
+    colorIdentity: string;
 
-    type: string = "Default";
+    @Prop()
+    type: string;
 
-    supertypes: string[];
+    @Prop()
+    supertypes: string;
 
-    types: string[];
+    @Prop()
+    types: string;
 
-    subtypes: string[];
+    @Prop()
+    subtypes: string;
 
+    @Prop()
     rarity: string;
 
+    @Prop()
     set: string;
 
-    text: string; 
+    @Prop()
+    text: string;
 
+    @Prop()
     multiverseid: number;
 
+    @Prop()
     imageUrl: string;
 
-    isCommander: boolean = false;
-
+    @Prop({ default: false })
+    isCommander: boolean;
 }
 
 export const CardsSchema = SchemaFactory.createForClass(Card);

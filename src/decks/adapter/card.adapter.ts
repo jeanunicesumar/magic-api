@@ -10,17 +10,15 @@ export default class CardAdapter implements Adapter<Card, CreateCardDto> {
 
     const card: Card = new Card();
     card.name = dto.name;
-    card.names = dto.names;
     card.manaCost = dto.manaCost;
     card.cmc = dto.cmc;
-    card.colors = dto.colors;
-    card.colorIdentity = dto.colorIdentity;
+    card.colors = dto.colors?.join("-");
+    card.colorIdentity = dto.colorIdentity?.join("-");
     card.type = dto.type;
-    card.types = dto.types;
-    card.supertypes = dto.supertypes;
-    card.subtypes = dto.subtypes;
+    card.types = dto.types?.join("-");
+    card.supertypes = dto.supertypes?.join("-");
+    card.subtypes = dto.subtypes?.join("-");
     card.rarity = dto.rarity;
-    card.set = dto.set;
     card.set = dto.set;
     card.text = dto.text;
     card.multiverseid = dto.multiverseid;

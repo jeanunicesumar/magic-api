@@ -18,7 +18,7 @@ export class DecksFactory {
     public async build(cache: boolean): Promise<Deck> {
 
         const commander = await this.findCommander(cache);
-        const colorsFormatted = this.formatColors(commander.colorIdentity);
+        const colorsFormatted = commander.colors;
 
         const cards = await this.findCards(colorsFormatted, 99, cache);
 
@@ -41,10 +41,6 @@ export class DecksFactory {
         }
 
         throw new NotFoundException("Não foi encontrado commander para a montagem do Deck.");
-    }
-
-    private formatColors(colors: string[]): string {
-        return colors.join(" ");
     }
 
     private async findCards(colorsFormatted: string, size: number, cache: boolean): Promise<Card[]> {
@@ -105,7 +101,7 @@ export class DecksFactory {
 
         // TODO: Retirar
 
-        const hasInvalidColor = !card.colorIdentity?.some(color => colorsFormatted.includes(color));
+        const hasInvalidColor = !card.colors?.some(color => colorsFormatted.includes(color));
         const isDuplicate = card.rarity !== 'Basic Land' && cardsFound.has(card.name);
 
         return !hasInvalidColor && !isDuplicate;
@@ -117,7 +113,7 @@ export class DecksFactory {
 
         return (commander: CreateCardDto) => 
             commander.supertypes?.includes('Legendary') 
-            && commander.colorIdentity?.length > 0;
+            && commander.colors?.length > 0;
     }
 
     private createDeck(cards: Card[], commander: Card): Deck {

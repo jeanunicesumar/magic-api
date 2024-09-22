@@ -5,9 +5,6 @@ export class CreateCardDto {
     @IsNotEmpty()
     name: string;
 
-    @IsNotEmpty()
-    names: string[];
-
     manaCost: string;
 
     cmc: string;

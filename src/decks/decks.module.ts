@@ -1,6 +1,9 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { RedisService } from 'src/config/redis/redis.service';
+import { User, UsersSchema } from 'src/users/entities/user.entity';
+import { UsersRepository } from 'src/users/users.repository';
+import { CardFactory } from 'src/utils/factories/card-factory';
 import { DecksFactory } from 'src/utils/factories/decks-factory';
 import { MagicRequest } from 'src/utils/request/magic.request';
 import CardAdapter from './adapter/card.adapter';
@@ -20,6 +23,7 @@ import { AuthService } from 'src/config/auth/auth.service';
     UsersModule
   ],
   providers: [DecksService, DecksRepository, DecksFactory, MagicRequest, CardAdapter, RedisService, CardRepository, UsersRepository, AuthService],
+
   controllers: [DecksController],
 })
 export class DecksModule {}
