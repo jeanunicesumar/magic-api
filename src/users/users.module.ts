@@ -24,5 +24,6 @@ import { AuthService } from 'src/config/auth/auth.service';
     ],
     providers: [UsersService, UsersRepository, Token, Password, AuthService],
     controllers: [UsersController],
+    exports: [UsersRepository, MongooseModule]
 })
 export class UsersModule {}
