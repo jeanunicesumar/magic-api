@@ -19,7 +19,7 @@ export class DecksController {
   
   @UseGuards(AuthGuard)
   @Get('/generate')
-  public async generate(@Query('cache') cache: string = 'false', @Req() request: any): Promise<Deck> {
+  public async generate(@Query('cache') cache: string = 'true', @Req() request: any): Promise<Deck> {
     const userId = request.decodedData?.sub;
     return await this.decksService.generate(cache, userId);
   }
@@ -38,6 +38,13 @@ export class DecksController {
     return response.sendFile(filePath);
   }
 
+  @Get('/list-user-decks')
+  @UseGuards(AuthGuard)
+  public async listDecks(@Req() req: any): Promise<Deck[]> {
+      const userId = req.decodedData?.sub;
+      return await this.decksService.listDecks(userId);
+  }
+
   @Post('/populate/cards')
   public async populate(): Promise<void> {
     this.decksService.populate();
@@ -49,7 +56,7 @@ export class DecksController {
     return this.decksService.create(createDeckDto, userId);
   }
  
-  @Get('/')
+  @Get()
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   public async findAll(@Query('page') page: number = 1) {
@@ -59,7 +66,7 @@ export class DecksController {
   @Get(':id')
   public async findOne(@Param('id') id: string) {
     return this.decksService.findOne(id);
-  }
+  }  
 
   @Patch(':id')
   public async update(@Param('id') id: string, @Body() updateDeckDto: UpdateDeckDto) {

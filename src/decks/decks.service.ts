@@ -7,6 +7,7 @@ import { DecksRepository } from './decks.repository';
 import { CreateDeckDto } from './dto/create-deck.dto';
 import { UpdateDeckDto } from './dto/update-deck.dto';
 import { Deck } from './entities/deck.entity';
+import { RedisService } from 'src/config/redis/redis.service';
 
 @Injectable()
 export class DecksService {
@@ -15,7 +16,8 @@ export class DecksService {
     private readonly repository: DecksRepository,
     private readonly factory: DecksFactory,
     private readonly cardFactory: CardFactory,
-    private readonly user: UsersRepository
+    private readonly user: UsersRepository,
+    private readonly redis: RedisService
   ) {}
 
   public async generate(cache: string, userId: string): Promise<Deck> {
@@ -44,6 +46,18 @@ export class DecksService {
     const limit = 2;
     const offset = (page - 1) * limit;
      return this.repository.findAll(offset, limit);
+  }
+
+  public async listDecks(userId: string): Promise<Deck[]> {
+    const key = `user:${userId}:decks`;
+    const cachedDecks = await this.redis.getValue(key);
+
+    if (cachedDecks) {
+      return JSON.parse(cachedDecks) as Deck[];
+    }   
+    const user = await this.user.findById(userId);
+    await this.redis.setValue(key, JSON.stringify(user.decks));
+    return user.decks;
   }
 
   public async findOne(id: string): Promise<Deck> {
