@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { CreateDeckDto } from './dto/create-deck.dto';
 import { UpdateDeckDto } from './dto/update-deck.dto';
 import { Deck } from './entities/deck.entity';
@@ -10,13 +10,15 @@ import { Deck } from './entities/deck.entity';
 export class DecksRepository {
 
     constructor(@InjectModel(Deck.name) private readonly model: Model<Deck>) { }
-
+    _id?: Types.ObjectId;
     // TODO: Nos cards repository(Criado com tarefa de popular)
     // Criar método para buscar commander
     // Criar método para buscar cartas já trazer 99 corretas filtrando terreno e cores
 
-    public async findAll(): Promise<Deck[]> {
-        return this.model.find();
+    public async findAll(offset: number, limit: number): Promise<Deck[]> {
+        return this.model.find()
+            .skip(offset)
+            .limit(limit);
     }
 
     public async findById(id: string): Promise<Deck | null> {

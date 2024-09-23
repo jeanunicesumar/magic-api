@@ -22,16 +22,15 @@ export class DecksService {
     private readonly user: UsersRepository
   ) {}
 
-  public async generate(cache: string): Promise<Deck> {
+  public async generate(cache: string, userId: string): Promise<Deck> {
     const deck: Deck = await this.factory.build(this.convertCacheToBoolean(cache));
-    this.repository.create(deck);
+    this.create(deck, userId);
 
     return deck;
   }
 
   public async generateJson(cache: string): Promise<string> {
     const deck: Deck = await this.factory.build(this.convertCacheToBoolean(cache));
-    this.repository.create(deck);
     
     return Json.toJson(deck);
   }
@@ -39,15 +38,16 @@ export class DecksService {
   public async create(createDeckDto: CreateDeckDto, userId: string): Promise<void> {
     const deck: Deck = await this.repository.create(createDeckDto); 
     const user = await this.user.findById(userId);
-
     if (user) {
       user.decks.push(deck);
-      this.user.create(user);  
+      await this.user.create(user);  
     }
   }
 
-  public async findAll(): Promise<Deck[]> {
-    return this.repository.findAll();
+  public async findAll(page: number): Promise<Deck[]> {
+    const limit = 2;
+    const offset = (page - 1) * limit;
+     return this.repository.findAll(offset, limit);
   }
 
   public async findOne(id: string): Promise<Deck> {
