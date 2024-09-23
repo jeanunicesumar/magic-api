@@ -13,6 +13,9 @@ export class CreateCardDto {
     colors: string[];
 
     @IsNotEmpty()
+    colorIdentity: string[];
+
+    @IsNotEmpty()
     type: string;
 
     supertypes: string[];

@@ -1,4 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotAcceptableException } from '@nestjs/common';
+import { plainToInstance } from 'class-transformer';
+import { validate } from 'class-validator';
 import { UsersRepository } from 'src/users/users.repository';
 import { CardFactory } from 'src/utils/factories/card-factory';
 import { DecksFactory } from 'src/utils/factories/decks-factory';
@@ -6,8 +8,10 @@ import { Json } from 'src/utils/json/json';
 import { DecksRepository } from './decks.repository';
 import { CreateDeckDto } from './dto/create-deck.dto';
 import { UpdateDeckDto } from './dto/update-deck.dto';
+import { ValidateDeckDTO } from './dto/validate-deck.dto';
 import { Deck } from './entities/deck.entity';
 import { RedisService } from 'src/config/redis/redis.service';
+import { ValidationDeck } from './validation/validation-deck';
 
 @Injectable()
 export class DecksService {
@@ -45,7 +49,7 @@ export class DecksService {
   public async findAll(page: number): Promise<Deck[]> {
     const limit = 2;
     const offset = (page - 1) * limit;
-     return this.repository.findAll(offset, limit);
+      return this.repository.findAll(offset, limit);
   }
 
   public async listDecks(userId: string): Promise<Deck[]> {
@@ -74,6 +78,27 @@ export class DecksService {
 
   public async populate(): Promise<void> {
     this.cardFactory.populate();
+  }
+
+  public async validateJson(file: Express.Multer.File): Promise<string> {
+
+    const data = file.buffer.toString('utf8');
+    const deck: ValidateDeckDTO = JSON.parse(data.toString());
+
+    const deckToValidation = plainToInstance(ValidateDeckDTO, deck);
+    const errors = await validate(deckToValidation);
+
+    if (errors.length !== 0) {
+      throw new NotAcceptableException(errors);
+    }
+
+    this.callValidationDeck(deckToValidation);
+
+    return "Deck válido";
+  }
+
+  private callValidationDeck(deck: ValidateDeckDTO) {
+    new ValidationDeck().handle(deck);
   }
 
   private convertCacheToBoolean(cache: string): boolean {

@@ -19,6 +19,9 @@ export class Card {
     colors: string;
 
     @Prop()
+    colorIdentity: string;
+
+    @Prop()
     type: string;
 
     @Prop()

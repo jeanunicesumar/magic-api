@@ -13,11 +13,13 @@ import { DecksRepository } from './decks.repository';
 import { DecksService } from './decks.service';
 import { Card, CardsSchema } from './entities/card.entity';
 import { Deck, DecksSchema } from './entities/deck.entity';
+import { UsersModule } from 'src/users/users.module';
 import { AuthService } from 'src/config/auth/auth.service';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Deck.name, schema: DecksSchema }, { name: Card.name, schema: CardsSchema }, { name: User.name, schema: UsersSchema }]),
+    MongooseModule.forFeature([{ name: Deck.name, schema: DecksSchema }, { name: Card.name, schema: CardsSchema }]),
+    UsersModule
   ],
   providers: [DecksService, DecksRepository, DecksFactory, MagicRequest, CardAdapter, RedisService, CardRepository, UsersRepository, CardFactory, AuthService],
   controllers: [DecksController],
