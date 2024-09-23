@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { RedisService } from 'src/config/redis/redis.service';
-import { User, UsersSchema } from 'src/users/entities/user.entity';
 import { UsersRepository } from 'src/users/users.repository';
 import { CardFactory } from 'src/utils/factories/card-factory';
 import { DecksFactory } from 'src/utils/factories/decks-factory';
@@ -13,7 +12,6 @@ import { DecksRepository } from './decks.repository';
 import { DecksService } from './decks.service';
 import { Card, CardsSchema } from './entities/card.entity';
 import { Deck, DecksSchema } from './entities/deck.entity';
-import { UsersRepository } from 'src/users/users.repository';
 import { UsersModule } from 'src/users/users.module';
 import { AuthService } from 'src/config/auth/auth.service';
 
@@ -22,7 +20,7 @@ import { AuthService } from 'src/config/auth/auth.service';
     MongooseModule.forFeature([{ name: Deck.name, schema: DecksSchema }, { name: Card.name, schema: CardsSchema }]),
     UsersModule
   ],
-  providers: [DecksService, DecksRepository, DecksFactory, MagicRequest, CardAdapter, RedisService, CardRepository, UsersRepository, AuthService],
+  providers: [DecksService, DecksRepository, DecksFactory, MagicRequest, CardAdapter, RedisService, CardRepository, UsersRepository,CardFactory, AuthService],
 
   controllers: [DecksController],
 })
