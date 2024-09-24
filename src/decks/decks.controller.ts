@@ -14,10 +14,9 @@ import { RolesGuard } from '../users/roles/roles.guard';
 
 @Controller('decks')
 
-
 export class DecksController {
   constructor(private readonly service: DecksService) {}
-  
+ 
   @UseGuards(AuthGuard)
   @Get('/generate')
   public async generate(@Query('cache') cache: string = 'true', @Req() request: any): Promise<Deck> {
@@ -37,6 +36,13 @@ export class DecksController {
     response.setHeader('Content-Disposition', 'attachment; filename="deck.json"');
 
     return response.sendFile(filePath);
+  }
+
+  @Get('/list-user-decks')
+  @UseGuards(AuthGuard)
+  public async listDecks(@Req() req: any): Promise<Deck[]> {
+      const userId = req.decodedData?.sub;
+      return await this.service.listDecks(userId);
   }
 
   @Post('/populate/cards')
@@ -62,7 +68,8 @@ export class DecksController {
     return this.decksService.create(createDeckDto, userId);
   }
  
-  @Get('/')
+
+  @Get()
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   public async findAll(@Query('page') page: number = 1) {
