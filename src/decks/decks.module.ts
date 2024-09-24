@@ -20,8 +20,7 @@ import { AuthService } from 'src/config/auth/auth.service';
     MongooseModule.forFeature([{ name: Deck.name, schema: DecksSchema }, { name: Card.name, schema: CardsSchema }]),
     UsersModule
   ],
-  providers: [DecksService, DecksRepository, DecksFactory, MagicRequest, CardAdapter, RedisService, CardRepository, UsersRepository,CardFactory, AuthService],
-
+  providers: [DecksService, DecksRepository, DecksFactory, MagicRequest, CardAdapter, RedisService, CardRepository, UsersRepository, CardFactory, AuthService],
   controllers: [DecksController],
 })
 export class DecksModule {}
