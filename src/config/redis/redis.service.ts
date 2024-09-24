@@ -8,7 +8,7 @@ export class RedisService {
   ) {}
 
   async setValue(key: string, value: string): Promise<void> {
-    await this.redisClient.set(key, value);
+    await this.redisClient.set(key, value, 'EX', 3600);
   }
 
   async getValue(key: string): Promise<string | null> {

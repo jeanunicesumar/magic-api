@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { RedisService } from 'src/config/redis/redis.service';
-import { User, UsersSchema } from 'src/users/entities/user.entity';
 import { UsersRepository } from 'src/users/users.repository';
 import { CardFactory } from 'src/utils/factories/card-factory';
 import { DecksFactory } from 'src/utils/factories/decks-factory';

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, FileTypeValidator, Get, MaxFileSizeValidator, Param, ParseFilePipe, Patch, Post, Query, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, FileTypeValidator, Get, MaxFileSizeValidator, Param, ParseFilePipe, Patch, Post, Query, Req, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import * as fs from 'fs';
@@ -11,6 +11,7 @@ import { AuthGuard } from 'src/config/auth/auth.guard';
 import { Role } from '../users/roles/role';
 import { Roles } from '../users/roles/roles.decorator';
 import { RolesGuard } from '../users/roles/roles.guard';
+const cluster = require('node:cluster');
 
 @Controller('decks')
 
@@ -47,9 +48,9 @@ export class DecksController {
 
   @Post('/populate/cards')
   public async populate(): Promise<void> {
-    this.service.populate();
+     this.service.populate();
   }
-
+  
   @Post('validate/json')
   @UseInterceptors(FileInterceptor('file'))
   public async uploadFile(@UploadedFile(new ParseFilePipe({
@@ -65,7 +66,7 @@ export class DecksController {
   @Post()
   public async create(@Body() createDeckDto: CreateDeckDto, @Req() request: any): Promise<void> {
     const userId = request.user.sub;
-    return this.decksService.create(createDeckDto, userId);
+    return this.service.create(createDeckDto, userId);
   }
  
 
@@ -73,7 +74,7 @@ export class DecksController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   public async findAll(@Query('page') page: number = 1) {
-       return this.decksService.findAll(page);
+       return this.service.findAll(page);
   }
 
   @Get(':id')
