@@ -18,14 +18,16 @@ export class CardFactory {
 
         console.time('Time');
     
-        const readableStream = await this.createPaginatedStream(1, 313);
-        const readableStream2 = await this.createPaginatedStream(314, 627);
-        const readableStream3 = await this.createPaginatedStream(628, 937);
+        const readableStream = await this.createPaginatedStream(1, 235);
+        const readableStream2 = await this.createPaginatedStream(236, 469);
+        const readableStream3 = await this.createPaginatedStream(470, 704);
+        const readableStream4 = await this.createPaginatedStream(705, 937);
     
         await Promise.all([
             this.consumePaginatedStream(readableStream),
             this.consumePaginatedStream(readableStream2),
             this.consumePaginatedStream(readableStream3),
+            this.consumePaginatedStream(readableStream4),
         ]);
     
         console.timeEnd('Time');
