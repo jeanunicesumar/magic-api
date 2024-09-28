@@ -103,14 +103,4 @@ export class DecksService {
     new ValidationDeck().handle(deck);
   }
 
-  private convertCacheToBoolean(cache: string): boolean {
-    
-    if ('false' === cache?.toLowerCase()) {
-      return false;
-    }
-
-    return true;
-
-  }
-
 }
