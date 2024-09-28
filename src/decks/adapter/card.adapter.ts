@@ -23,7 +23,7 @@ export default class CardAdapter implements Adapter<Card, CreateCardDto> {
     card.text = dto.text;
     card.multiverseid = dto.multiverseid;
     card.imageUrl = dto.imageUrl;
-    card.isCommander = dto.supertypes?.includes('Legendary');
+    card.isCommander = dto.type?.startsWith('Legendary Creature');
 
     return card;
 

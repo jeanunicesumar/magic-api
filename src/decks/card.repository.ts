@@ -25,4 +25,21 @@ export class CardRepository {
         await this.model.create(cards);
     }
 
+    public async findCommanderRandom(): Promise<Card> {
+        const result = await this.model.aggregate([
+            { $match: { isCommander: true } },
+            { $sample: { size: 1 } }
+        ]);
+    
+        return result[0] as Card;
+    }
+
+    public async findByColorIdentity(colors: string[]): Promise<Card[]> {
+        const regex = colors.map(color => new RegExp(color));
+    
+        return await this.model.find({
+            colorIdentity: { $in: regex }
+        }).limit(99) as Card[];
+    }
+
 }
