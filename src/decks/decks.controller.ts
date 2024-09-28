@@ -11,7 +11,6 @@ import { AuthGuard } from 'src/config/auth/auth.guard';
 import { Role } from '../users/roles/role';
 import { Roles } from '../users/roles/roles.decorator';
 import { RolesGuard } from '../users/roles/roles.guard';
-const cluster = require('node:cluster');
 
 @Controller('decks')
 
@@ -62,13 +61,11 @@ export class DecksController {
     return this.service.validateJson(file)
   }
 
-
   @Post()
   public async create(@Body() createDeckDto: CreateDeckDto, @Req() request: any): Promise<void> {
     const userId = request.user.sub;
     return this.service.create(createDeckDto, userId);
-  }
- 
+  } 
 
   @Get()
   @UseGuards(AuthGuard, RolesGuard)
