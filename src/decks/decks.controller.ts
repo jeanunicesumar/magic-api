@@ -13,7 +13,6 @@ import { UpdateDeckDto } from './dto/update-deck.dto';
 import { Deck } from './entities/deck.entity';
 
 @Controller('decks')
-
 export class DecksController {
   constructor(private readonly service: DecksService) {}
  

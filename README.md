@@ -1,73 +1,229 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+# Magic API - NestJS
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Descrição
 
-## Description
+Esta API foi desenvolvida utilizando [NestJS](https://nestjs.com/) para fornecer informações sobre os cards e decks do jogo Magic: The Gathering. A API permite a visualização e gestão de cards, decks e usuários, com funcionalidades como geração de decks, autenticação de usuários, validação de arquivos JSON, e listagem de decks de usuários.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+### Criadores
 
-## Installation
+- Cássia Yumi
+- Jean Soares
+
+## Pré-requisitos
+
+Certifique-se de ter os seguintes itens instalados e configurados:
+
+- Node.js (v14 ou superior)
+- Docker (Redis)
+
+### Dependências
+
+A API utiliza Redis para caching. Você precisará de um contêiner Redis em execução na porta padrão (6379).
+
+Para subir um contêiner Redis, execute o comando:
 
 ```bash
-$ npm install
+docker run -d -p 6379:6379 redis
 ```
 
-## Running the app
+## Rotas
+### Endpoints de Decks
+
+#### `/decks/generate` 
+
+**Método:** `GET`  
+**Autenticação:** Requer token JWT  
+**Descrição:** Gera um novo deck para o usuário autenticado.  
+**Exemplo de uso:**
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+GET /decks/generate
 ```
 
-## Test
+#### `/decks/generate/json` 
+
+**Método:** `GET`  
+**Descrição:** Gera um arquivo JSON contendo um deck e o envia como download.  
+**Exemplo de uso:**
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+GET /decks/generate/json
 ```
 
-## Support
+#### `/decks/list-user-decks`
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+**Método:** `GET`  
+**Autenticação:** Requer token JWT  
+**Descrição:** Lista todos os decks pertencentes ao usuário autenticado.  
+**Exemplo de uso:**
 
-## Stay in touch
+```bash
+GET /decks/list-user-decks
+```
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+#### `/decks/populate/cards` 
 
-## License
+**Método:** `POST`  
+**Descrição:** Popula os cards da API de [MAGIC]("http://api.magicthegathering.io/v1/cards") no banco de dados.
 
-Nest is [MIT licensed](LICENSE).
+```bash
+POST /decks/populate/cards
+```
+
+#### `/decks/validate/json`
+
+**Método:** `POST`  
+**Descrição:** Valida um arquivo JSON carregado contendo um deck de Magic.  
+**Exemplo de uso:**
+
+```bash
+POST /decks/validate/json
+```
+
+#### `/decks`
+
+**Método:** `POST`  
+**Autenticação:** Requer token JWT  
+**Descrição:** Cria um novo deck para o usuário autenticado.  
+**Exemplo de uso:**
+
+```bash
+POST /decks
+```
+
+#### `/decks`
+
+**Método:** `GET`  
+**Autenticação:** Requer token JWT e a role `ADMIN`  
+**Descrição:** Lista todos os decks, com paginação.  
+**Exemplo de uso:**
+
+```bash
+GET /decks?page=1
+```
+
+#### `/decks/:id`
+
+**Método:** `GET`  
+**Descrição:** Retorna as informações de um deck específico.  
+**Exemplo de uso:**
+
+```bash
+GET /decks/:id
+```
+
+#### `/decks/:id`
+
+**Método:** `PATCH`  
+**Descrição:** Atualiza os dados de um deck específico.  
+**Exemplo de uso:**
+
+```bash
+PATCH /decks/:id
+```
+
+#### `/decks/:id`
+
+**Método:** `DELETE`  
+**Descrição:** Remove um deck específico.  
+**Exemplo de uso:**
+
+```bash
+DELETE /decks/:id
+```
+
+### Endpoints de Usuários
+
+#### `/users`
+
+**Método:** `GET`  
+**Autenticação:** Requer token JWT e a role `ADMIN`  
+**Descrição:** Lista todos os usuários cadastrados.  
+**Exemplo de uso:**
+
+```bash
+GET /users
+```
+
+#### `/users/:id`
+
+**Método:** `GET`  
+**Autenticação:** Requer token JWT  
+**Descrição:** Retorna as informações de um usuário específico.  
+**Exemplo de uso:**
+
+```bash
+GET /users/:id
+```
+
+#### `/users`
+
+**Método:** `POST`  
+**Descrição:** Cria um novo usuário.  
+**Exemplo de uso:**
+
+```bash
+POST /users
+```
+
+#### `/users/:id`
+
+**Método:** `PATCH`  
+**Descrição:** Atualiza as informações de um usuário específico.  
+**Exemplo de uso:**
+
+```bash
+PATCH /users/:id
+```
+
+#### `/users/:id`
+
+**Método:** `DELETE`  
+**Descrição:** Remove um usuário específico.  
+**Exemplo de uso:**
+
+```bash
+DELETE /users/:id
+```
+
+#### `/users/auth`
+
+**Método:** `POST`  
+**Descrição:** Autentica um usuário e retorna um token JWT.  
+**Exemplo de uso:**
+
+```bash
+POST /users/auth
+```
+
+## Instalação
+
+1. Clone este repositório:
+   ```bash
+   git clone https://github.com/seu-usuario/magic-api.git
+   cd magic-api
+   ```
+
+2. Instale as dependências:
+   ```bash
+   npm install
+   ```
+
+3. Configure as variáveis de ambiente (exemplo no arquivo `.env`):
+   ```bash
+   API_URL=""
+   DATABASE=""
+   SECRET_KEY=""
+   EXPIRES_IN=""
+   SALT_ROUNDS=
+   ```
+
+4. Execute o projeto:
+   ```bash
+   npm run start
+   ```
+
+## Contribuições
+
+Sinta-se à vontade para contribuir com este projeto. Para sugestões ou melhorias, abra uma issue ou envie um pull request.
