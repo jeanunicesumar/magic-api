@@ -201,7 +201,7 @@ POST /users/auth
 
 1. Clone este repositório:
    ```bash
-   git clone https://github.com/seu-usuario/magic-api.git
+   git clone https://github.com/jeanunicesumar/magic-api.git
    cd magic-api
    ```
 
