@@ -1,6 +1,7 @@
 import { Injectable, NotAcceptableException } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
+import { RedisService } from 'src/config/redis/redis.service';
 import { UsersRepository } from 'src/users/users.repository';
 import { CardFactory } from 'src/utils/factories/card-factory';
 import { DecksFactory } from 'src/utils/factories/decks-factory';
@@ -10,7 +11,6 @@ import { CreateDeckDto } from './dto/create-deck.dto';
 import { UpdateDeckDto } from './dto/update-deck.dto';
 import { ValidateDeckDTO } from './dto/validate-deck.dto';
 import { Deck } from './entities/deck.entity';
-import { RedisService } from 'src/config/redis/redis.service';
 import { ValidationDeck } from './validation/validation-deck';
 
 @Injectable()
@@ -24,15 +24,16 @@ export class DecksService {
     private readonly redis: RedisService
   ) {}
 
-  public async generate(cache: string, userId: string): Promise<Deck> {
-    const deck: Deck = await this.factory.build(this.convertCacheToBoolean(cache));
+  public async generate(userId: string): Promise<Deck> {
+
+    const deck: Deck = await this.factory.build();
     this.create(deck, userId);
 
     return deck;
   }
 
-  public async generateJson(cache: string): Promise<string> {
-    const deck: Deck = await this.factory.build(this.convertCacheToBoolean(cache));
+  public async generateJson(): Promise<string> {
+    const deck: Deck = await this.factory.build();
     
     return Json.toJson(deck);
   }
@@ -40,6 +41,7 @@ export class DecksService {
   public async create(createDeckDto: CreateDeckDto, userId: string): Promise<void> {
     const deck: Deck = await this.repository.create(createDeckDto); 
     const user = await this.user.findById(userId);
+
     if (user) {
       user.decks.push(deck);
       await this.user.create(user);  
@@ -49,7 +51,7 @@ export class DecksService {
   public async findAll(page: number): Promise<Deck[]> {
     const limit = 2;
     const offset = (page - 1) * limit;
-      return this.repository.findAll(offset, limit);
+    return this.repository.findAll(offset, limit);
   }
 
   public async listDecks(userId: string): Promise<Deck[]> {

@@ -3,14 +3,14 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import * as fs from 'fs';
 import * as path from 'path';
-import { DecksService } from './decks.service';
-import { CreateDeckDto } from './dto/create-deck.dto';
-import { UpdateDeckDto } from './dto/update-deck.dto';
-import { Deck } from './entities/deck.entity';
 import { AuthGuard } from 'src/config/auth/auth.guard';
 import { Role } from '../users/roles/role';
 import { Roles } from '../users/roles/roles.decorator';
 import { RolesGuard } from '../users/roles/roles.guard';
+import { DecksService } from './decks.service';
+import { CreateDeckDto } from './dto/create-deck.dto';
+import { UpdateDeckDto } from './dto/update-deck.dto';
+import { Deck } from './entities/deck.entity';
 
 @Controller('decks')
 
@@ -19,15 +19,15 @@ export class DecksController {
  
   @UseGuards(AuthGuard)
   @Get('/generate')
-  public async generate(@Query('cache') cache: string = 'true', @Req() request: any): Promise<Deck> {
+  public async generate(@Req() request: any): Promise<Deck> {
     const userId = request.decodedData?.sub;
-    return await this.service.generate(cache, userId);
+    return await this.service.generate(userId);
   }
 
   @Get('/generate/json')
-  public async generateJson(@Res() response: Response,  @Query('cache') cache: string = 'true'): Promise<void> {
+  public async generateJson(@Res() response: Response): Promise<void> {
 
-    const json: string = await this.service.generateJson(cache);
+    const json: string = await this.service.generateJson();
 
     const filePath: string = path.join(__dirname, 'deck.json');
     fs.writeFileSync(filePath, json);
