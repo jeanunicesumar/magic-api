@@ -1,4 +1,4 @@
-import { Injectable, NotAcceptableException } from '@nestjs/common';
+import { Inject, Injectable, NotAcceptableException } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { RedisService } from 'src/config/redis/redis.service';
@@ -12,6 +12,7 @@ import { UpdateDeckDto } from './dto/update-deck.dto';
 import { ValidateDeckDTO } from './dto/validate-deck.dto';
 import { Deck } from './entities/deck.entity';
 import { ValidationDeck } from './validation/validation-deck';
+import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
 export class DecksService {
@@ -21,14 +22,15 @@ export class DecksService {
     private readonly factory: DecksFactory,
     private readonly cardFactory: CardFactory,
     private readonly user: UsersRepository,
-    private readonly redis: RedisService
+    private readonly redis: RedisService,
+    @Inject('Notifications_service') private readonly notificationsClient: ClientProxy
   ) {}
 
   public async generate(userId: string): Promise<Deck> {
 
     const deck: Deck = await this.factory.build();
     this.create(deck, userId);
-
+    this.notificationsClient.emit('deck_generated', {userId, deck})
     return deck;
   }
 
@@ -71,6 +73,7 @@ export class DecksService {
   }
 
   public async update(id: string, deck: UpdateDeckDto): Promise<void> {
+    this.notificationsClient.emit('deck_updated', { id, deck });
     return this.repository.update(id, deck);
   }
 
