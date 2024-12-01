@@ -1,4 +1,5 @@
 import { Inject, Injectable, NotAcceptableException } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { RedisService } from 'src/config/redis/redis.service';
@@ -12,7 +13,6 @@ import { UpdateDeckDto } from './dto/update-deck.dto';
 import { ValidateDeckDTO } from './dto/validate-deck.dto';
 import { Deck } from './entities/deck.entity';
 import { ValidationDeck } from './validation/validation-deck';
-import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
 export class DecksService {
@@ -87,6 +87,29 @@ export class DecksService {
 
   public async validateJson(file: Express.Multer.File): Promise<string> {
 
+    const deckToValidation: ValidateDeckDTO = await this.validateFile(file);
+    this.callValidationDeck(deckToValidation);
+
+    return "Deck válido";
+  }
+
+  public async importJson(file: Express.Multer.File): Promise<string> {
+
+    const deckToValidation: ValidateDeckDTO = await this.validateFile(file);
+    this.callValidationDeck(deckToValidation);
+
+    const deck: Deck = await this.repository.create(deckToValidation);
+    this.notificationsClient.emit('deck_generated', deck);
+
+    return "Deck importado";
+  }
+
+  private callValidationDeck(deck: ValidateDeckDTO) {
+    new ValidationDeck().handle(deck);
+  }
+
+  private async validateFile(file: Express.Multer.File): Promise<ValidateDeckDTO> {
+       
     const data = file.buffer.toString('utf8');
     const deck: ValidateDeckDTO = JSON.parse(data.toString());
 
@@ -96,14 +119,9 @@ export class DecksService {
     if (errors.length !== 0) {
       throw new NotAcceptableException(errors);
     }
+    
+    return deckToValidation;
 
-    this.callValidationDeck(deckToValidation);
-
-    return "Deck válido";
-  }
-
-  private callValidationDeck(deck: ValidateDeckDTO) {
-    new ValidationDeck().handle(deck);
   }
 
 }

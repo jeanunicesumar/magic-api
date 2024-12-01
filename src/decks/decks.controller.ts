@@ -60,6 +60,17 @@ export class DecksController {
     return this.service.validateJson(file)
   }
 
+  @Post('import/json')
+  @UseInterceptors(FileInterceptor('file'))
+  public async importFile(@UploadedFile(new ParseFilePipe({
+    validators: [
+      new MaxFileSizeValidator({ maxSize: 100000 }),
+      new FileTypeValidator({ fileType: 'application/json' }),
+    ],
+  })) file: Express.Multer.File): Promise<string> {
+    return this.service.importJson(file)
+  }
+
   @Post()
   public async create(@Body() createDeckDto: CreateDeckDto, @Req() request: any): Promise<void> {
     const userId = request.user.sub;
